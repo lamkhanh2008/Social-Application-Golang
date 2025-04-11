@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"social_todo/common"
+	ginitem "social_todo/module/item/transport/gin"
 	"strconv"
 	"time"
 
@@ -59,11 +60,12 @@ func main() {
 	{
 		items := v1.Group("/items")
 		{
-			items.POST("", CreateItem(db))
+			items.POST("/", ginitem.CreateItem(db))
 			items.GET("/", ListItem(db))
-			items.GET("/:id", GetItem(db))
-			items.PATCH("/:id", UpdateItem(db))
+			items.GET("/:id", ginitem.GetItemByID(db))
+			items.PATCH("/:id", ginitem.UpdateItemById(db))
 			items.DELETE("/:id", SoftDeleteItem(db))
+			items.GET("/list", ginitem.GetListItems(db))
 		}
 	}
 

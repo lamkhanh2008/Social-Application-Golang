@@ -1,8 +1,14 @@
 package model
 
 import (
+	"errors"
+	"fmt"
 	"social_todo/common"
 	"strings"
+)
+
+var (
+	ErrTitleCannotBeEmpty = errors.New("title cannot be empty")
 )
 
 type TodoItem struct {
@@ -28,13 +34,14 @@ func (TodoItem) TableName() string { return "todo_items" }
 
 func (TodoItemCreation) TableName() string { return TodoItem{}.TableName() }
 
-func (data *TodoItemCreation) Validate() bool {
+func (data *TodoItemCreation) Validate() error {
 	title := strings.TrimSpace(data.Title)
+	fmt.Println("title: ", title)
 	if title != "" {
-		return true
+		return nil
 	}
 
-	return false
+	return ErrTitleCannotBeEmpty
 }
 
 func (TodoItemUpdate) TableName() string {
