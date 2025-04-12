@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"social_todo/common"
 	"social_todo/module/item/model"
 	"social_todo/module/item/utils"
 
@@ -15,6 +16,9 @@ func (sqlStore *itemStorage) GetByID(ctx context.Context, cond map[string]interf
 		if err == gorm.ErrRecordNotFound {
 			return nil, utils.ErrNotFound
 		}
+
+		return nil, common.ErrDB(err)
+
 	}
 
 	return &data, nil

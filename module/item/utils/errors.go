@@ -13,5 +13,5 @@ var (
 	ErrCannotDeleteItem    = errors.New("cannot delete TODO item")
 	ErrRequesterIsNotOwner = errors.New("no permission, only TODO owner can do this")
 	ErrItemIDInvalid       = errors.New("invalid TODO id")
-	ErrNotFound            = errors.New("todo item not found")
+	ErrNotFound            = errors.New("Record not found")
 )

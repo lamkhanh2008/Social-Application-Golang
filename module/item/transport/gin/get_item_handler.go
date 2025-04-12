@@ -27,9 +27,7 @@ func GetItemByID(db *gorm.DB) func(*gin.Context) {
 		data, err := business.GetItemById(ctx.Request.Context(), id)
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			ctx.JSON(http.StatusBadRequest, err)
 
 			return
 		}
