@@ -1,6 +1,7 @@
 package ginitem
 
 import (
+	"fmt"
 	"net/http"
 	"social_todo/common"
 	"social_todo/module/item/biz"
@@ -13,7 +14,8 @@ import (
 
 func GetItemByID(db *gorm.DB) func(*gin.Context) {
 	return func(ctx *gin.Context) {
-		id, err := strconv.Atoi(ctx.Param("id"))
+		id, err := strconv.Atoi(ctx.Query("id"))
+		fmt.Println(id)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),

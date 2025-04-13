@@ -2,6 +2,7 @@ package common
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -66,4 +67,16 @@ func (e *AppError) Error() string {
 
 func ErrDB(err error) *AppError {
 	return NewFullErrorResponse(http.StatusInternalServerError, err, "Something wrong in DB", err.Error(), "DB_Error")
+}
+
+func ErrCannotGetEntity(entityname string, err error) *AppError {
+	return NewFullErrorResponse(http.StatusNotFound, err, fmt.Sprintf("Record %+v not found", entityname), err.Error(), "entity not found")
+}
+
+func ErrInternal(err error) *AppError {
+	return NewFullErrorResponse(http.StatusInternalServerError, err, "Error internal", err.Error(), "error internal")
+}
+
+func ErrInvalidRequest(err error) *AppError {
+	return NewCustomError(err, err.Error(), "Invalid Request")
 }

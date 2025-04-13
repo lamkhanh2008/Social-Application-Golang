@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"social_todo/common"
+	"social_todo/middleware"
 	ginitem "social_todo/module/item/transport/gin"
+	"social_todo/module/upload"
 	"strconv"
 	"time"
 
@@ -55,14 +57,19 @@ func main() {
 	}
 	db = db.Debug()
 	r := gin.Default()
-
+	r.Static("/static", "./static")
 	v1 := r.Group("/v1")
+
+	v1.Use(middleware.Recover())
+
 	{
+		v1.PUT("/upload", upload.Upload(db))
+
 		items := v1.Group("/items")
 		{
 			items.POST("/", ginitem.CreateItem(db))
-			items.GET("/", ListItem(db))
-			items.GET("/:id", ginitem.GetItemByID(db))
+			// items.GET("/", ListItem(db))
+			items.GET("/", ginitem.GetItemByID(db))
 			items.PATCH("/:id", ginitem.UpdateItemById(db))
 			items.DELETE("/:id", SoftDeleteItem(db))
 			items.GET("/list", ginitem.GetListItems(db))
