@@ -65,8 +65,8 @@ func (j *jwtProvider) Validate(myToken string) (tokenprovider.TokenPayLoad, erro
 	return claims.Payload, nil
 }
 
-func NewTokenJWTProvider(prefix string) *jwtProvider {
-	return &jwtProvider{prefix: prefix}
+func NewTokenJWTProvider(prefix string, secretKey string) *jwtProvider {
+	return &jwtProvider{prefix: prefix, secret: secretKey}
 }
 
 type myClaims struct {

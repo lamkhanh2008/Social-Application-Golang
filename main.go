@@ -8,6 +8,7 @@ import (
 	"social_todo/middleware"
 	ginitem "social_todo/module/item/transport/gin"
 	"social_todo/module/upload"
+	ginuser "social_todo/module/user/transport/gin"
 	"strconv"
 	"time"
 
@@ -63,8 +64,9 @@ func main() {
 	v1.Use(middleware.Recover())
 
 	{
+		v1.POST("/login", ginuser.Logic(db))
 		v1.PUT("/upload", upload.Upload(db))
-
+		v1.POST("/register", ginuser.Register(db))
 		items := v1.Group("/items")
 		{
 			items.POST("/", ginitem.CreateItem(db))
