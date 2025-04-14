@@ -12,6 +12,13 @@ const (
 	CurrrentUser = "current_user"
 )
 
+type DBType int
+
+const (
+	DBItem DBType = 1
+	DBUser DBType = 2
+)
+
 type Requester interface {
 	GetUserId() int
 	GetEmail() string

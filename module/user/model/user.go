@@ -88,6 +88,10 @@ func (User) TableName() string {
 	return EntityName
 }
 
+func (u *User) Mask() {
+	u.SQLModel.Mask(common.DBUser)
+}
+
 type UserCreate struct {
 	common.SQLModel `json:",inline"`
 	Email           string `json:"email" gorm:"column:email;"`

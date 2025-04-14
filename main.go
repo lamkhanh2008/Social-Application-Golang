@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"social_todo/common"
+	appCtx "social_todo/component/appContext"
 	"social_todo/component/tokenprovider/jwt"
 	"social_todo/middleware"
 	ginitem "social_todo/module/item/transport/gin"
@@ -67,6 +67,8 @@ func main() {
 		fmt.Println(err)
 	}
 
+	appContext := appCtx.NewAppContext(db)
+	db = appContext.GetMaiDBConnection()
 	authStore := storage.NewSQLStore(db)
 	tokenProvider := jwt.NewTokenJWTProvider("jwt", jwtSecret)
 	db = db.Debug()
@@ -103,113 +105,6 @@ func main() {
 	}
 }
 
-func CreateItem(db *gorm.DB) func(ctx *gin.Context) {
-	return func(c *gin.Context) {
-		var itemData TodoItemCreation
-
-		if err := c.ShouldBind(&itemData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
-			return
-		}
-
-		if err := db.Create(&itemData).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
-			return
-		}
-		fmt.Println(itemData)
-		c.JSON(http.StatusOK, gin.H{
-			"data": itemData.Id,
-		})
-	}
-}
-
-func GetItem(db *gorm.DB) func(ctx *gin.Context) {
-	return func(ctx *gin.Context) {
-		var itemData TodoItem
-
-		id, err := strconv.Atoi(ctx.Param("id"))
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := db.Where("id = ?", id).First(&itemData).Error; err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-		}
-
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": itemData,
-		})
-	}
-}
-
-func UpdateItem(db *gorm.DB) func(ctx *gin.Context) {
-	return func(ctx *gin.Context) {
-		var itemData TodoItemUpdate
-		id, err := strconv.Atoi(ctx.Param("id"))
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err := ctx.ShouldBind(&itemData); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
-			return
-		}
-
-		if err = db.Where("id = ?", id).Updates(&itemData).Error; err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
-			return
-		}
-
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": true,
-		})
-	}
-}
-
-func HardDeleteItem(db *gorm.DB) func(ctx *gin.Context) {
-	return func(ctx *gin.Context) {
-		id, err := strconv.Atoi(ctx.Param("id"))
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if err = db.Table(TodoItem{}.TableName()).Where("id = ?", id).Delete(nil).Error; err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
-			return
-		}
-
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": true,
-		})
-	}
-}
-
 func SoftDeleteItem(db *gorm.DB) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		id, err := strconv.Atoi(ctx.Param("id"))
@@ -233,34 +128,6 @@ func SoftDeleteItem(db *gorm.DB) func(ctx *gin.Context) {
 
 		ctx.JSON(http.StatusOK, gin.H{
 			"data": true,
-		})
-	}
-}
-
-func ListItem(db *gorm.DB) func(ctx *gin.Context) {
-	return func(c *gin.Context) {
-		var result []TodoItem
-		var paging common.Paging
-
-		if err := c.ShouldBind(&paging); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		paging.Process()
-		fmt.Println(paging)
-		if err := db.Table(TodoItem{}.TableName()).Offset((paging.Page - 1) * paging.Limit).Limit(paging.Limit).Order("id desc").Find(&result).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"data": result,
 		})
 	}
 }

@@ -19,6 +19,7 @@ type TodoItem struct {
 	Status      string        `json:"status" gorm:"column:status;"`
 	Image       *common.Image `json:"image" gorm:"column:image;"`
 	UserId      int           `json:"user_id" gorm:"column:user_id;"`
+	// Owner *common.SimpleUser `json:"owner" gorm:"foreignKey:UserID;"`
 }
 
 type TodoItemCreation struct {
@@ -35,6 +36,10 @@ type TodoItemUpdate struct {
 }
 
 func (TodoItem) TableName() string { return "todo_items" }
+
+func (u *TodoItem) Mask() {
+	u.SQLModel.Mask(common.DBItem)
+}
 
 func (TodoItemCreation) TableName() string { return TodoItem{}.TableName() }
 

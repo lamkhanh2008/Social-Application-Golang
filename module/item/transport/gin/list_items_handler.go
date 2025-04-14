@@ -40,6 +40,10 @@ func GetListItems(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
+		for i := range result {
+			result[i].Mask()
+		}
+
 		ctx.JSON(http.StatusOK, common.NewResponse(result, querytring.Filter, querytring.Paging))
 	}
 }
