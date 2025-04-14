@@ -4,12 +4,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"social_todo/common"
+	"social_todo/component/tokenprovider/jwt"
+	"social_todo/middleware"
 	ginitem "social_todo/module/item/transport/gin"
+	"social_todo/module/upload"
+	"social_todo/module/user/storage"
+	ginuser "social_todo/module/user/transport/gin"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -48,24 +55,40 @@ func (TodoItem) TableName() string {
 }
 
 func main() {
-	dsn := "root:lamnt@tcp(localhost:3307)/social-todo?charset=utf8&parseTime=True&loc=Local"
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	dsn := os.Getenv("DB_Conn")
+	jwtSecret := os.Getenv("JWT_SECRET")
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	authStore := storage.NewSQLStore(db)
+	tokenProvider := jwt.NewTokenJWTProvider("jwt", jwtSecret)
 	db = db.Debug()
 	r := gin.Default()
-
+	r.Static("/static", "./static")
 	v1 := r.Group("/v1")
+
+	v1.Use(middleware.Recover())
+
 	{
+		v1.POST("/login", ginuser.Logic(db, tokenProvider))
+		v1.PUT("/upload", upload.Upload(db))
+		v1.POST("/register", ginuser.Register(db))
+		v1.GET("/profile", middleware.RequiredAuth(authStore, tokenProvider), ginuser.Profile())
 		items := v1.Group("/items")
 		{
-			items.POST("/", ginitem.CreateItem(db))
-			items.GET("/", ListItem(db))
-			items.GET("/:id", ginitem.GetItemByID(db))
-			items.PATCH("/:id", ginitem.UpdateItemById(db))
+			items.POST("/", middleware.RequiredAuth(authStore, tokenProvider), ginitem.CreateItem(db))
+			// items.GET("/", ListItem(db))
+			items.GET("/", middleware.RequiredAuth(authStore, tokenProvider), ginitem.GetItemByID(db))
+			items.PATCH("/:id", middleware.RequiredAuth(authStore, tokenProvider), ginitem.UpdateItemById(db))
 			items.DELETE("/:id", SoftDeleteItem(db))
-			items.GET("/list", ginitem.GetListItems(db))
+			items.GET("/list", middleware.RequiredAuth(authStore, tokenProvider), ginitem.GetListItems(db))
 		}
 	}
 

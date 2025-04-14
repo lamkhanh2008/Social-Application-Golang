@@ -9,7 +9,7 @@ type ItemBusiness interface {
 	CreateItem(ctx context.Context, itemData *model.TodoItemCreation) error
 	DeleteItemById(ctx context.Context, id int) error
 	GetItemById(ctx context.Context, id int) (*model.TodoItem, error)
-	UpdateItem(ctx context.Context, id int, dataUpdate *model.TodoItemUpdate) error
+	// UpdateItem(ctx context.Context, id int, dataUpdate *model.TodoItemUpdate) error
 }
 type service struct {
 	biz ItemBusiness

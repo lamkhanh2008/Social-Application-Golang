@@ -9,17 +9,21 @@ import (
 
 var (
 	ErrTitleCannotBeEmpty = errors.New("title cannot be empty")
+	EntityName            = "Todo_items"
 )
 
 type TodoItem struct {
 	common.SQLModel
-	Title       string `json:"title" gorm:"column:title;"`
-	Description string `json:"description" gorm:"column:description;"`
-	Status      string `json:"status" gorm:"column:status;"`
+	Title       string        `json:"title" gorm:"column:title;"`
+	Description string        `json:"description" gorm:"column:description;"`
+	Status      string        `json:"status" gorm:"column:status;"`
+	Image       *common.Image `json:"image" gorm:"column:image;"`
+	UserId      int           `json:"user_id" gorm:"column:user_id;"`
 }
 
 type TodoItemCreation struct {
 	Id          int    `json:"id" gorm:"column:id;"`
+	UserId      int    `json:"-" gorm:"column:user_id;"`
 	Title       string `json:"title" gorm:"column:title;"`
 	Description string `json:"description" gorm:"column:description;"`
 }

@@ -2,6 +2,7 @@ package common
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -66,4 +67,42 @@ func (e *AppError) Error() string {
 
 func ErrDB(err error) *AppError {
 	return NewFullErrorResponse(http.StatusInternalServerError, err, "Something wrong in DB", err.Error(), "DB_Error")
+}
+
+func ErrCannotGetEntity(entityname string, err error) *AppError {
+	return NewFullErrorResponse(http.StatusNotFound, err, fmt.Sprintf("Record %+v not found", entityname), err.Error(), "entity not found")
+}
+
+func ErrInternal(err error) *AppError {
+	return NewFullErrorResponse(http.StatusInternalServerError, err, "Error internal", err.Error(), "error internal")
+}
+
+func ErrInvalidRequest(err error) *AppError {
+	return NewCustomError(err, err.Error(), "Invalid Request")
+}
+
+func RecordNotFound(entityName string, err error) *AppError {
+	return NewFullErrorResponse(http.StatusNotFound, err, fmt.Sprintf("record of %s not found", entityName), err.Error(), "Record not found")
+}
+
+func ErrCannotCreateEntity(entityName string, err error) *AppError {
+	return NewFullErrorResponse(http.StatusBadRequest, err, fmt.Sprintf("Create record of %s error", entityName), err.Error(), "Create Record err")
+}
+
+func ErrNoPermission(err error) *AppError {
+	return NewCustomError(err, err.Error(), "ErrNoPermission")
+}
+
+func ErrValidate(err error) *AppError {
+	return NewCustomError(err, err.Error(), "err Validate")
+}
+
+func ErrCannotUpdateEntity(entityName string, err error) *AppError {
+	return NewFullErrorResponse(http.StatusBadRequest, err, fmt.Sprintf("Update record of %s error", entityName), err.Error(), "Update Record err")
+
+}
+
+func ErrCannotListEntity(entityName string, err error) *AppError {
+	return NewFullErrorResponse(http.StatusBadRequest, err, fmt.Sprintf("Get list records of %s error", entityName), err.Error(), "Get List Records err")
+
 }
