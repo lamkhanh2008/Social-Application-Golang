@@ -61,5 +61,8 @@ func RequiredAuth(authStore AuthenStore, tokenprovider tokenprovider.Provider) f
 		if user.Status == 0 {
 			panic(common.ErrNoPermission(errors.New("User has been deleted or banned")))
 		}
+
+		c.Set(common.CurrrentUser, user)
+		c.Next()
 	}
 }

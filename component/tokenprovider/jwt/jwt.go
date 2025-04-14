@@ -50,7 +50,7 @@ func (j *jwtProvider) Validate(myToken string) (tokenprovider.TokenPayLoad, erro
 	})
 
 	if err != nil {
-		return nil, tokenprovider.ErrInvalidToken
+		return nil, err
 	}
 
 	if !res.Valid {
@@ -70,7 +70,7 @@ func NewTokenJWTProvider(prefix string, secretKey string) *jwtProvider {
 }
 
 type myClaims struct {
-	Payload tokenprovider.TokenPayLoad `json:"payload"`
+	Payload tokenprovider.TokenPayLoadImpl `json:"payload"`
 	jwt.StandardClaims
 }
 

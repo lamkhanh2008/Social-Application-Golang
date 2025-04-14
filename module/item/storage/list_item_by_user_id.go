@@ -11,6 +11,10 @@ func (sqlStore *itemStorage) ListItems(ctx context.Context, filter *model.Filter
 
 	db := sqlStore.db.Where("status <> ?", "Deleted")
 
+	requester := ctx.Value(common.CurrrentUser).(common.Requester)
+
+	db = db.Where("user_id = ?", requester.GetUserId())
+
 	if f := filter; f != nil {
 		if v := f.Status; v != "" {
 			db = db.Where("status = ?", v)

@@ -92,3 +92,17 @@ func ErrCannotCreateEntity(entityName string, err error) *AppError {
 func ErrNoPermission(err error) *AppError {
 	return NewCustomError(err, err.Error(), "ErrNoPermission")
 }
+
+func ErrValidate(err error) *AppError {
+	return NewCustomError(err, err.Error(), "err Validate")
+}
+
+func ErrCannotUpdateEntity(entityName string, err error) *AppError {
+	return NewFullErrorResponse(http.StatusBadRequest, err, fmt.Sprintf("Update record of %s error", entityName), err.Error(), "Update Record err")
+
+}
+
+func ErrCannotListEntity(entityName string, err error) *AppError {
+	return NewFullErrorResponse(http.StatusBadRequest, err, fmt.Sprintf("Get list records of %s error", entityName), err.Error(), "Get List Records err")
+
+}

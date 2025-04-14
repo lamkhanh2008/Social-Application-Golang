@@ -2,7 +2,7 @@ package ginuser
 
 import (
 	"social_todo/common"
-	"social_todo/component/tokenprovider/jwt"
+	"social_todo/component/tokenprovider"
 	biz "social_todo/module/user/business"
 	"social_todo/module/user/model"
 	"social_todo/module/user/storage"
@@ -11,15 +11,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func Logic(db *gorm.DB) gin.HandlerFunc {
+func Logic(db *gorm.DB, tokenProvider tokenprovider.Provider) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var loginUserData model.UserLogin
 
 		if err := c.ShouldBind(&loginUserData); err != nil {
 			panic(common.ErrInvalidRequest(err))
 		}
-
-		tokenProvider := jwt.NewTokenJWTProvider("jwt", "200Lab.io")
 
 		store := storage.NewSQLStore(db)
 		md5 := common.NewMd5Hash()

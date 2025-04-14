@@ -19,7 +19,10 @@ func CreateItem(db *gorm.DB) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, err)
 			return
 		}
-		fmt.Println("asdasdads %+v", itemData)
+
+		requester := ctx.MustGet(common.CurrrentUser).(common.Requester)
+		itemData.UserId = requester.GetUserId()
+
 		storage := storage.NewItemStorage(db)
 		bussiness := biz.NewItemBusiness(storage)
 		service := NewItemService(bussiness)
